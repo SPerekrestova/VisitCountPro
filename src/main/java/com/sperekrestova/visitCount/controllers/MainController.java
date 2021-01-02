@@ -16,4 +16,16 @@ public class MainController {
         model.addAttribute("title", "Главная страница");
         return "home";
     }
+
+    @GetMapping("/timetable")
+    public String timetable(Model model) {
+        model.addAttribute("title", "Расписание");
+        return "timetable";
+    }
+
+    @GetMapping("/marks")
+    public String marks(Model model) {
+        model.addAttribute("title", "Оценки");
+        return "marks";
+    }
 }
