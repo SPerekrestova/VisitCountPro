@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 
@@ -23,12 +24,16 @@ public class StudyingGroup {
     @OneToMany(mappedBy="group")
     private List<Student> students;
 
+    @ManyToMany
+    private List<Professor> profs;
+
     public StudyingGroup() {
     }
 
-    public StudyingGroup(String groupName, List<Student> students) {
+    public StudyingGroup(String groupName, List<Student> students, List<Professor> profs) {
         this.groupName = groupName;
         this.students = students;
+        this.profs = profs;
     }
 
     public Long getId() {
@@ -53,5 +58,13 @@ public class StudyingGroup {
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    public List<Professor> getProfs() {
+        return profs;
+    }
+
+    public void setProfs(List<Professor> profs) {
+        this.profs = profs;
     }
 }
