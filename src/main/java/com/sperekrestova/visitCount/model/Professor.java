@@ -1,5 +1,6 @@
 package com.sperekrestova.visitCount.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,6 +21,9 @@ public class Professor {
 
     private String firstName;
     private String lastName;
+    @Column(unique = true)
+    private String email;
+    private String password;
 
     @ManyToMany(mappedBy="profs")
     private List<StudyingGroup> lectureGroups;
@@ -27,10 +31,28 @@ public class Professor {
     public Professor() {
     }
 
-    public Professor(String firstName, String lastName, List<StudyingGroup> lectureGroups) {
+    public Professor(String firstName, String lastName, String email, String password, List<StudyingGroup> lectureGroups) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
+        this.password = password;
         this.lectureGroups = lectureGroups;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getId() {
