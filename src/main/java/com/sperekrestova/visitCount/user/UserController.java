@@ -17,10 +17,10 @@ public class UserController {
 
     private final UserService userService;
 
-    /*@GetMapping("/sign-in")
+    @GetMapping("/sign-in")
     String signIn() {
         return "sign-in";
-    }*/
+    }
 
     @GetMapping("/sign-up")
     String signUpPage(@ModelAttribute("user") User user) {
@@ -30,6 +30,6 @@ public class UserController {
     @PostMapping("/sign-up")
     String signUp(@ModelAttribute("user") User user) {
         userService.signUpUser(user);
-        return "redirect:/";
+        return "redirect:/sign-in";
     }
 }
