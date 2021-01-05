@@ -23,25 +23,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("prof")
-                .password(bCryptPasswordEncoder.encode("pass"))
-                .roles("USER")
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                //Доступ только для не зарегистрированных пользователей
+                .antMatchers("/sign-up").not().fullyAuthenticated()
+                //Доступ только для пользователей с ролью Администратор
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/").hasRole("USER")
+                //Все остальные страницы требуют аутентификации
+                .anyRequest().authenticated()
                 .and()
-                .withUser("root")
-                .password(bCryptPasswordEncoder.encode("root"))
-                .roles("ADMIN");
+                //Настройка для входа в систему
+                .formLogin()
+                //Перенарпавление на главную страницу после успешного входа
+                .defaultSuccessUrl("/")
+                .permitAll()
+                .and()
+                .logout()
+                .permitAll();
     }
 
-    @Override
+    /*@Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/**").permitAll().anyRequest().authenticated()
                 .and().formLogin();
-    }
+    }*/
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

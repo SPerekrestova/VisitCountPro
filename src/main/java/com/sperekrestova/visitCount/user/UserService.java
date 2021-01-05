@@ -1,14 +1,13 @@
 package com.sperekrestova.visitCount.user;
 
 import com.sperekrestova.visitCount.model.User;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
 import java.util.Optional;
 
 /**
@@ -17,19 +16,20 @@ import java.util.Optional;
  */
 
 @Service
-@AllArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        final Optional<User> optionalUser = userRepository.findByEmail(email);
-        return optionalUser.orElseThrow(() -> new UsernameNotFoundException(
-                MessageFormat.format("User with email {0} cannot be found.", email)
-        ));
-
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException(email);
+        }
+        return new MyUserPrincipal(user.get());
     }
 
     public void signUpUser(User user) {
