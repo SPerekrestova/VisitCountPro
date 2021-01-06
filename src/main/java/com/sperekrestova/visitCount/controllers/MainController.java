@@ -45,7 +45,7 @@ public class MainController {
         return "signup_form";
     }
 
-    @PostMapping("/process_register")
+    @PostMapping("/register")
     public String processRegister(User user) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
