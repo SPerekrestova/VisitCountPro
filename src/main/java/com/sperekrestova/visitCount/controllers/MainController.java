@@ -2,6 +2,7 @@ package com.sperekrestova.visitCount.controllers;
 
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class MainController {
 
+    @Autowired
     private UserRepository userRepo;
 
     @GetMapping("/")
