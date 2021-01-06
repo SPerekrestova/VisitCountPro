@@ -1,5 +1,6 @@
 package com.sperekrestova.visitCount.controllers;
 
+import com.sperekrestova.visitCount.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +30,11 @@ public class MainController {
     @GetMapping("/admin")
     public String admin(Model model) {
         return "admin";
+    }
+
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new User());
+        return "signup_form";
     }
 }
