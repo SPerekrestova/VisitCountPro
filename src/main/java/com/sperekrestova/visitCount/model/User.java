@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,6 +49,9 @@ public class User implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+    @ManyToMany(mappedBy="profs")
+    private List<StudyingGroup> lectureGroups;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
