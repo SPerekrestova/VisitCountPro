@@ -1,5 +1,6 @@
 package com.sperekrestova.visitCount.controllers;
 
+import com.sperekrestova.visitCount.model.Role;
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Collections;
 
 /**
  * Created by Svetlana
@@ -50,6 +53,7 @@ public class MainController {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         userRepo.save(user);
         return "register_success";
     }

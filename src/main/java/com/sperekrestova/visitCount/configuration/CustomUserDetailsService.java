@@ -1,6 +1,7 @@
 package com.sperekrestova.visitCount.configuration;
 
 import com.sperekrestova.visitCount.model.User;
+import com.sperekrestova.visitCount.repository.RoleRepository;
 import com.sperekrestova.visitCount.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
+    UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
+    @Autowired
     private UserRepository userRepo;
 
     @Override
@@ -22,6 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return new CustomUserDetails(user);
+        return user;
     }
 }
