@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
@@ -23,19 +21,19 @@ import javax.persistence.ManyToOne;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstName;
+    private String secondName;
     private String lastName;
 
     @ManyToOne
     private StudyingGroup group;
 
-    public Student(String firstName, String lastName, StudyingGroup group) {
+    public Student(Long id, String firstName, String lastName, StudyingGroup group) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.group = group;
     }
-
 }
