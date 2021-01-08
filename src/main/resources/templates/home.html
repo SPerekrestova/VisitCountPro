@@ -12,7 +12,7 @@
         Здравствуйте, <span sec:authentication="name">Username</span>
     </div>
 
-    <div sec:authorize="hasAnyAuthority('ADMIN')">
+    <div sec:authorize="hasRole('ADMIN')">
         <a href="/admin">Открыть панель Администратора</a>
     </div>
 
