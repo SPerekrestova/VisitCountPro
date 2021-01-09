@@ -8,14 +8,46 @@
     <body class="text-center">
     <header th:insert="blocks/header.html :: header"></header>
     <h1>Главная</h1>
-    <div sec:authorize="isAuthenticated()">
-        Здравствуйте, <span sec:authentication="name">Username</span>
+    <div class="my-5" sec:authorize="isAuthenticated()">
+        <h3> Здравствуйте, <span sec:authentication="name">Username</span> </h3>
     </div>
 
-    <div sec:authorize="hasRole('ADMIN')">
+    <div class="my-5" sec:authorize="hasRole('ADMIN')">
         <p class="lead">
             <a href="/admin" class="btn btn-lg btn-secondary">Открыть панель Администратора</a>
         </p>
+    </div>
+
+    <div class="container my-5">
+        <div class="card-deck mb-3 text-center">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Оценки</h4>
+                </div>
+                <div class="card-body">
+                    <a href="/marks" role="button" class="btn btn-lg btn-block btn-primary">Посмотреть оценки</a>
+                    <a href="/load/marks" role="button" class="btn btn-lg btn-block btn-primary">Загрузить оценки</a>
+                </div>
+            </div>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Расписание</h4>
+                </div>
+                <div class="card-body">
+                    <a href="/timetable" role="button" class="btn btn-lg btn-block btn-primary">Посмотреть расписание</a>
+                    <a href="/load/timetable" role="button" class="btn btn-lg btn-block btn-primary">Загрузить расписание</a>
+                </div>
+            </div>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Группы</h4>
+                </div>
+                <div class="card-body">
+                    <a href="/groups" role="button" class="btn btn-lg btn-block btn-primary">Посмотреть группы</a>
+                    <a href="/load/groups" role="button" class="btn btn-lg btn-block btn-primary">Загрузить группы</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     </body>

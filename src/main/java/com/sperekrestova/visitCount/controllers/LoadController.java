@@ -3,36 +3,29 @@ package com.sperekrestova.visitCount.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Created by Svetlana
- * Date: 02.01.2021
+ * Date: 09.01.2021
  */
 @Controller
-public class MainController {
-
-    @GetMapping("/")
-    public String home(Model model) {
-        return "home";
-    }
+@RequestMapping("/load")
+public class LoadController {
 
     @GetMapping("/timetable")
     public String timetable(Model model) {
-        return "timetable";
+        return "load-timetable";
     }
 
     @GetMapping("/marks")
     public String marks(Model model) {
-        return "marks";
-    }
-
-    @GetMapping("/admin")
-    public String admin(Model model) {
-        return "admin";
+        return "load-marks";
     }
 
     @GetMapping("/groups")
     public String groups(Model model) {
-        return "groups";
+        return "load-groups";
     }
+
 }
