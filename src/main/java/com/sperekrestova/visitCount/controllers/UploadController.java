@@ -31,24 +31,24 @@ import java.util.List;
  */
 @Controller
 @AllArgsConstructor
-@RequestMapping("/load")
-public class LoadController {
+@RequestMapping("/upload")
+public class UploadController {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/timetable")
     public String timetable(Model model) {
-        return "loading/load-timetable";
+        return "uploading/upload-timetable";
     }
 
     @GetMapping("/marks")
     public String marks(Model model) {
-        return "loading/load-marks";
+        return "uploading/upload-marks";
     }
 
     @GetMapping("/groups")
-    public String groups(Model model) {
-        return "loading/load-groups";
+    public String groups() {
+        return "uploading/upload-groups";
     }
 
     @PostMapping("/groups")
