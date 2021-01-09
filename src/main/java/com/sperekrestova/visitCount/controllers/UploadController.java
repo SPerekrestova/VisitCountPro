@@ -12,7 +12,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,12 +36,12 @@ public class UploadController {
     private final UserRepository userRepository;
 
     @GetMapping("/timetable")
-    public String timetable(Model model) {
+    public String timetable() {
         return "uploading/upload-timetable";
     }
 
     @GetMapping("/marks")
-    public String marks(Model model) {
+    public String marks() {
         return "uploading/upload-marks";
     }
 

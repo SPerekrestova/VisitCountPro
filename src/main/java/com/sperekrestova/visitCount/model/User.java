@@ -50,7 +50,7 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    @ManyToMany(mappedBy="profs")
+    @ManyToMany(mappedBy="profs", fetch = FetchType.EAGER)
     private List<StudyingGroup> lectureGroups;
 
     @Override
