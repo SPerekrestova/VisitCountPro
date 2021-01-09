@@ -2,13 +2,15 @@ package com.sperekrestova.visitCount.controllers;
 
 import com.sperekrestova.visitCount.model.Student;
 import com.sperekrestova.visitCount.model.StudyingGroup;
+import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.GroupRepository;
-import com.sperekrestova.visitCount.repository.StudentRepository;
+import com.sperekrestova.visitCount.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +33,8 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/load")
 public class LoadController {
-    private final StudentRepository studentRepository;
     private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/timetable")
     public String timetable(Model model) {
@@ -50,7 +52,9 @@ public class LoadController {
     }
 
     @PostMapping("/groups")
-    public String parseGroups(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException {
+    public String parseGroups(
+            @RequestParam("file") MultipartFile reapExcelDataFile,
+            @AuthenticationPrincipal User user) throws IOException {
         List<Student> tempStudentList = new ArrayList<Student>();
 
         HSSFWorkbook workbook = new HSSFWorkbook(reapExcelDataFile.getInputStream());
@@ -84,6 +88,8 @@ public class LoadController {
             tempStudentList.add(student);
         }
         studyingGroup.setStudents(tempStudentList);
+        //TODO: Check what happens when another user loads this group
+        studyingGroup.setProfs(new ArrayList<>(List.of(user)));
         //Save group to the database
         groupRepository.save(studyingGroup);
 
