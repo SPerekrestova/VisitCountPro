@@ -36,17 +36,17 @@ public class LoadController {
 
     @GetMapping("/timetable")
     public String timetable(Model model) {
-        return "load-timetable";
+        return "loading/load-timetable";
     }
 
     @GetMapping("/marks")
     public String marks(Model model) {
-        return "load-marks";
+        return "loading/load-marks";
     }
 
     @GetMapping("/groups")
     public String groups(Model model) {
-        return "load-groups";
+        return "loading/load-groups";
     }
 
     @PostMapping("/groups")

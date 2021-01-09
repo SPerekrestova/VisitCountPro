@@ -27,7 +27,7 @@ public class RegisterController {
     @GetMapping()
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "signup_form";
+        return "register/signup_form";
     }
 
     @PostMapping()
@@ -37,6 +37,6 @@ public class RegisterController {
         user.setPassword(encodedPassword);
         user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         userRepo.save(user);
-        return "register_success";
+        return "register/register_success";
     }
 }
