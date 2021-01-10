@@ -10,7 +10,7 @@
     <h1>Группы</h1>
 
     <div class="my-2">
-        <div th:each="group : ${lectureGroups}" class="my-5">
+        <div th:each="group : ${lectureGroups}" class="my-3">
             <a href="#" role="button" class="btn btn-lg btn-primary">
                 <h3 th:text="${group.getGroupName()}"></h3>
             </a>

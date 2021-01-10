@@ -64,6 +64,19 @@ public class UploadController {
         //create group instance
         StudyingGroup studyingGroup = new StudyingGroup(groupName);
 
+        //When the group already exists in the system
+        // And if this is a different user, we need to assign him to the existed group
+        if (groupRepository.findByGroupName(groupName) != null) {
+            if (!user.getLectureGroups().contains(studyingGroup)) {
+                StudyingGroup existedGroup = groupRepository.findByGroupName(groupName);
+                List<User> profs = existedGroup.getProfs();
+                profs.add(user);
+                existedGroup.setProfs(profs);
+                groupRepository.save(existedGroup);
+            }
+            return "redirect:/groups";
+        }
+
         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
             //New student instance
             Student student = new Student();
@@ -87,7 +100,7 @@ public class UploadController {
             tempStudentList.add(student);
         }
         studyingGroup.setStudents(tempStudentList);
-        //TODO: Check what happens when another user loads this group
+
         studyingGroup.setProfs(new ArrayList<>(List.of(user)));
         //Save group to the database
         groupRepository.save(studyingGroup);
