@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Просмотр группы</title>
+    <title>Просмотр студента</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 </head>
     <body class="text-center">
     <header th:insert="blocks/header.html :: header"></header>
-    <h1>Группа</h1>
+    <h1>Студент:</h1>
 
     <div class="my-2">
-        <div th:each="student : ${group.get().getStudents()}" class="my-3">
-            <a th:href="@{/student/{id}(id=${student.getId()})}"
-               th:text="${student.getLastName() + ' ' + student.getFirstName() + ' ' + student.getSecondName()}">student</a>
-        </div>
+        Фамилия: <p th:text="${student.getLastName()}"></p>
+        Имя: <p th:text="${student.getFirstName()}"></p>
+        Отчество: <p th:text="${student.getSecondName()}"></p>
+        Группа: <p th:text="${student.getGroup().getGroupName()}"></p>
     </div>
     </body>
 </html>
