@@ -1,9 +1,6 @@
 package com.sperekrestova.visitCount.controllers;
 
-import com.sperekrestova.visitCount.model.User;
-import com.sperekrestova.visitCount.repository.GroupRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @AllArgsConstructor
 public class MainController {
-
-    private final GroupRepository groupRepository;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -36,12 +31,6 @@ public class MainController {
     @GetMapping("/admin")
     public String admin(Model model) {
         return "admin";
-    }
-
-    @GetMapping("/groups")
-    public String groups(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("lectureGroups", user.getLectureGroups());
-        return "groups";
     }
 
     @GetMapping("/login")
