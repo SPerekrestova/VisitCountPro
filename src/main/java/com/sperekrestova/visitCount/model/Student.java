@@ -10,8 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.List;
 
 /**
  * Created by Svetlana
@@ -34,7 +32,4 @@ public class Student {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private StudyingGroup group;
-
-    @OneToMany()
-    private List<Marks> marks;
 }
