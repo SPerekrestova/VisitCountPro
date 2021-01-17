@@ -11,7 +11,7 @@
 
     <div class="my-2">
         <div th:each="student : ${group.get().getStudents()}" class="my-3">
-            <a href="#"
+            <a th:href="@{/student/{id}(id=${student.getId()})}"
                th:text="${student.getLastName() + ' ' + student.getFirstName() + ' ' + student.getSecondName()}">student</a>
         </div>
     </div>
