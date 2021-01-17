@@ -22,7 +22,7 @@ public class StudentController {
     @GetMapping("/{id}")
     public String showStudent(@PathVariable("id") int id, Model model) {
         model.addAttribute("student", studentRepository.findById((long) id).get());
-        return "student";
+        return "student/student";
     }
 
 }

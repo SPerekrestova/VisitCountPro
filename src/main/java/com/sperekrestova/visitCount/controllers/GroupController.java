@@ -24,12 +24,12 @@ public class GroupController {
     @GetMapping()
     public String groups(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("lectureGroups", user.getLectureGroups());
-        return "groups";
+        return "groups/groups";
     }
 
     @GetMapping("/{id}")
     public String getExactGroup(@PathVariable("id") int id, Model model) {
         model.addAttribute("group", groupRepository.findById((long) id));
-        return "show-group";
+        return "groups/show-group";
     }
 }
