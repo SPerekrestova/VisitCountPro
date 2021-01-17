@@ -7,34 +7,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.List;
+import javax.persistence.OneToOne;
+import java.io.Serializable;
 
 /**
  * Created by Svetlana
- * Date: 08.01.2021
+ * Date: 17.01.2021
  */
+
 @Entity
 @Getter
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class Student {
+public class Marks implements Serializable {
+
+    static final long serialVersionUID = 1L;
 
     @Id
-    private Long id;
+    @ManyToOne
+    private Student student;
+    @Id
+    @OneToOne
+    private Subject subject;
+    @Id
+    @OneToOne
+    private Timetable timetable;
 
-    private String firstName;
-    private String secondName;
-    private String lastName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private StudyingGroup group;
-
-    @OneToMany()
-    private List<Marks> marks;
+    private Mark mark;
 }
