@@ -5,12 +5,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.sql.Time;
@@ -27,32 +25,19 @@ import java.util.Date;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class Timetable {
-
-    @EmbeddedId
-    private TimetableKey key;
+public class Timetable implements Serializable {
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Subject subject;
+    @Id
+    private Date date;
+    @Id
+    private Time time;
 
     private String classroom;
     // Practice or lecture or laboratory lesson
     private String lessonType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private StudyingGroup studyingGroup;
-
-    @EqualsAndHashCode
-    @ToString
-    @Embeddable
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class TimetableKey implements Serializable {
-
-        static final long serialVersionUID = 1L;
-        @ManyToOne
-        private Subject subject;
-        private Date date;
-        private Time time;
-
-    }
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    private StudyingGroup studyingGroup;
 }

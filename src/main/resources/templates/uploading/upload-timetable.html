@@ -8,5 +8,19 @@
 <body class="text-center">
 <header th:insert="blocks/header.html :: header"></header>
 <h1>Загрузка расписания</h1>
+
+<div class="container text-center">
+    <form th:action="@{/upload/timetable}" method="post" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
+        <div class="m-3">
+            <div class="form-group row">
+                <input type="file" th:name="file" />
+            </div>
+
+            <div>
+                <button th:type="submit" class="btn btn-primary">Загрузить</button>
+            </div>
+        </div>
+    </form>
+</div>
 </body>
 </html>

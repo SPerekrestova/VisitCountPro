@@ -2,6 +2,7 @@ package com.sperekrestova.visitCount.controllers;
 
 import com.sperekrestova.visitCount.model.Student;
 import com.sperekrestova.visitCount.model.StudyingGroup;
+import com.sperekrestova.visitCount.model.Timetable;
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.GroupRepository;
 import com.sperekrestova.visitCount.repository.UserRepository;
@@ -48,6 +49,30 @@ public class UploadController {
     @GetMapping("/groups")
     public String groups() {
         return "uploading/upload-groups";
+    }
+
+    @PostMapping("/timetable")
+    public String parseTimetable(
+            @RequestParam("file") MultipartFile reapExcelDataFile,
+            @AuthenticationPrincipal User user) throws IOException {
+
+        HSSFWorkbook workbook = new HSSFWorkbook(reapExcelDataFile.getInputStream());
+
+        /**
+         * Парсить группу, для каждой группы создавать timetable,
+         * в него кидать инстанс предмета и все остальное.
+         */
+        List<StudyingGroup> profsGroups = user.getLectureGroups();
+        for (StudyingGroup group : profsGroups) {
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                HSSFSheet worksheet = workbook.getSheetAt(i);
+
+                Timetable timetable = new Timetable();
+
+            }
+        }
+
+        return "redirect:/timetable";
     }
 
     @PostMapping("/groups")

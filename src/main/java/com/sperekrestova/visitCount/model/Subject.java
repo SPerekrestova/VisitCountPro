@@ -6,15 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.List;
 
 /**
  * Created by Svetlana
@@ -38,6 +35,6 @@ public class Subject {
     @ManyToOne(fetch = FetchType.LAZY)
     private User prof;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Timetable> timetable;
+    /*@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Timetable> timetable;*/
 }
