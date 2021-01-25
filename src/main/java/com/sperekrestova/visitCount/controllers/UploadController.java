@@ -1,8 +1,13 @@
 package com.sperekrestova.visitCount.controllers;
 
+import com.aspose.cells.Cells;
+import com.aspose.cells.ColumnCollection;
+import com.aspose.cells.RowCollection;
+import com.aspose.cells.Workbook;
+import com.aspose.cells.Worksheet;
+import com.aspose.cells.WorksheetCollection;
 import com.sperekrestova.visitCount.model.Student;
 import com.sperekrestova.visitCount.model.StudyingGroup;
-import com.sperekrestova.visitCount.model.Timetable;
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.GroupRepository;
 import com.sperekrestova.visitCount.repository.UserRepository;
@@ -56,23 +61,67 @@ public class UploadController {
             @RequestParam("file") MultipartFile reapExcelDataFile,
             @AuthenticationPrincipal User user) throws IOException {
 
-        HSSFWorkbook workbook = new HSSFWorkbook(reapExcelDataFile.getInputStream());
+        List<StudyingGroup> lectureGroups = user.getLectureGroups();
+        Workbook workbook = null;
+        try {
+            workbook = new Workbook(reapExcelDataFile.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assert workbook != null;
+        WorksheetCollection sheets = workbook.getWorksheets();
+        for (int i = 0; i < sheets.getCount(); i++) {
+            Worksheet sheet = sheets.get(i);
+            sheet.getCells().deleteBlankRows();
+            sheet.getCells().deleteBlankColumns();
+            Cells cells = sheet.getCells();
+            // Get all columns from the sheet
+            ColumnCollection columns = sheet.getCells().getColumns();
+            // Iterate over the columns
+            for (int j = 0; j < columns.getCount(); j++) {
+                // Get all rows from the sheet
+                RowCollection rows = sheet.getCells().getRows();
+                // Iterate over the rows
+                for (int k = 0; k < rows.getCount(); k++) {
+                    // Get the value of the row
+                    String cellValue = cells.get(k, j).getStringValue();
+                    // Check if we took a group name
+                    if (cellValue.matches("[А-Я]{2,3}-\\d{2,3}.*")) {
+                        // If there are several group names in the cell, so it's a lecture class
+                        if (cellValue.length() > 10) {
+                            // TODO: enable a possibility for tracking lectures and several groups at once
+                        } else {
+                            // Check if the current user has this group
+                            if (checkIfProfHasThisGroup(lectureGroups, cellValue)) {
+                                /**
+                                 * For each lesson of the current group we need to create a Timetable instance;
+                                 * For each Timetable we need a Subject instance;
+                                 *
+                                 */
+                            } else {
+                                // TODO: Do we need to assign a group without students to the user if it's present in the schedule
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         /**
          * Парсить группу, для каждой группы создавать timetable,
          * в него кидать инстанс предмета и все остальное.
          */
-        List<StudyingGroup> profsGroups = user.getLectureGroups();
-        for (StudyingGroup group : profsGroups) {
-            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-                HSSFSheet worksheet = workbook.getSheetAt(i);
-
-                Timetable timetable = new Timetable();
-
-            }
-        }
 
         return "redirect:/timetable";
+    }
+
+    private boolean checkIfProfHasThisGroup(List<StudyingGroup> lectureGroups, String cellValue) {
+        for (StudyingGroup group : lectureGroups) {
+            if (group.getGroupName().equals(cellValue)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @PostMapping("/groups")
