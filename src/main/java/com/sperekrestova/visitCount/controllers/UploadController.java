@@ -61,12 +61,45 @@ public class UploadController {
             @RequestParam("file") MultipartFile reapExcelDataFile,
             @AuthenticationPrincipal User user) throws IOException {
 
+        //TODO: Подразумевается, что юзер уже загрузил группы. А что, если нет?
+
         List<StudyingGroup> lectureGroups = user.getLectureGroups();
         Workbook workbook = null;
         try {
             workbook = new Workbook(reapExcelDataFile.getInputStream());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        List<StudyingGroup> sg = findInTheFile(workbook, lectureGroups, "group");
+        System.out.println(sg.toString());
+        
+
+
+        /**
+         * For each lesson of the current group we need to create a Timetable instance;
+         * For each Timetable we need a Subject instance;
+         *
+         */
+        /**
+         * Парсить группу, для каждой группы создавать timetable,
+         * в него кидать инстанс предмета и все остальное.
+         */
+
+        return "redirect:/timetable";
+    }
+
+    private <T> List<T> findInTheFile(Workbook workbook, List<StudyingGroup> lectureGroups, String toFind) {
+        List<T> foundObjects = new ArrayList<>();
+        String regex = "";
+        switch (toFind) {
+            case "group":
+                regex = "[А-Я]{2,3}-\\d{2,3}.*";
+                break;
+            case "subject":
+                break;
+            default:
+                break;
         }
         assert workbook != null;
         WorksheetCollection sheets = workbook.getWorksheets();
@@ -86,18 +119,16 @@ public class UploadController {
                     // Get the value of the row
                     String cellValue = cells.get(k, j).getStringValue();
                     // Check if we took a group name
-                    if (cellValue.matches("[А-Я]{2,3}-\\d{2,3}.*")) {
+                    if (cellValue.matches(regex)) {
                         // If there are several group names in the cell, so it's a lecture class
-                        if (cellValue.length() > 10) {
+                        if (cellValue.length() > 10 && toFind.equals("group")) {
                             // TODO: enable a possibility for tracking lectures and several groups at once
-                        } else {
+                        } else if (toFind.equals("group")) {
                             // Check if the current user has this group
                             if (checkIfProfHasThisGroup(lectureGroups, cellValue)) {
-                                /**
-                                 * For each lesson of the current group we need to create a Timetable instance;
-                                 * For each Timetable we need a Subject instance;
-                                 *
-                                 */
+                                StudyingGroup sg = new StudyingGroup();
+                                sg.setGroupName(cellValue);
+                                foundObjects.add((T) sg);
                             } else {
                                 // TODO: Do we need to assign a group without students to the user if it's present in the schedule
                             }
@@ -106,13 +137,7 @@ public class UploadController {
                 }
             }
         }
-
-        /**
-         * Парсить группу, для каждой группы создавать timetable,
-         * в него кидать инстанс предмета и все остальное.
-         */
-
-        return "redirect:/timetable";
+        return foundObjects;
     }
 
     private boolean checkIfProfHasThisGroup(List<StudyingGroup> lectureGroups, String cellValue) {
