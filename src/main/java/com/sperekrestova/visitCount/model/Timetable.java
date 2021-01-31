@@ -11,8 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Created by Svetlana
@@ -30,9 +30,9 @@ public class Timetable implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Subject subject;
     @Id
-    private Date date;
+    private LocalDate date;
     @Id
-    private Time time;
+    private LocalTime time;
 
     private String classroom;
     // Practice or lecture or laboratory lesson

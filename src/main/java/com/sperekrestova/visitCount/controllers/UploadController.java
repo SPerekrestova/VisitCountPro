@@ -8,9 +8,10 @@ import com.aspose.cells.Worksheet;
 import com.aspose.cells.WorksheetCollection;
 import com.sperekrestova.visitCount.model.Student;
 import com.sperekrestova.visitCount.model.StudyingGroup;
+import com.sperekrestova.visitCount.model.Subject;
+import com.sperekrestova.visitCount.model.Timetable;
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.GroupRepository;
-import com.sperekrestova.visitCount.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -25,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,7 +49,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/upload")
 public class UploadController {
     private final GroupRepository groupRepository;
-    private final UserRepository userRepository;
 
     @GetMapping("/timetable")
     public String timetable() {
@@ -64,13 +68,12 @@ public class UploadController {
     @PostMapping("/timetable")
     public String parseTimetable(
             @RequestParam("file") MultipartFile reapExcelDataFile,
-            @AuthenticationPrincipal User user) throws IOException {
+            @AuthenticationPrincipal User user) {
 
         if (user.getLectureGroups().isEmpty()) {
             return "redirect:/groups";
         }
 
-        List<StudyingGroup> lectureGroups = user.getLectureGroups();
         Workbook workbook = null;
         try {
             workbook = new Workbook(reapExcelDataFile.getInputStream());
@@ -78,35 +81,46 @@ public class UploadController {
             e.printStackTrace();
         }
 
-        List<StudyingGroup> sg = findInTheFile(workbook, lectureGroups, "group");
+        // Find in the file all groups which are related to the current user
+        List<StudyingGroup> sg = findInTheFile(workbook, user, "group", "");
         List<String> groupsToFind = sg.stream()
                 .filter(distinctByKey(StudyingGroup::getGroupName))
                 .map(StudyingGroup::getGroupName)
                 .collect(Collectors.toList());
-        
 
+        List<StudyingGroup> lectureGroups = user.getLectureGroups();
 
-        /**
-         * For each lesson of the current group we need to create a Timetable instance;
-         * For each Timetable we need a Subject instance;
-         *
-         */
-        /**
-         * Парсить группу, для каждой группы создавать timetable,
-         * в него кидать инстанс предмета и все остальное.
-         */
+        for (StudyingGroup group : lectureGroups) {
+            // For each user's group we need to find timetables if the groups are presented in the file
+            if (groupsToFind.contains(group.getGroupName())) {
+                List<Timetable> timetables = new ArrayList<>(
+                        findInTheFile(workbook, user, "timetable", group.getGroupName())
+                );
+                // Set list of found timetables to the user's group
+                group.setTimetables(timetables);
+                // Save to the db updated group
+                groupRepository.save(group);
+            }
+        }
 
         return "redirect:/timetable";
     }
 
-    private <T> List<T> findInTheFile(Workbook workbook, List<StudyingGroup> lectureGroups, String toFind) {
+    /**
+     * For each lesson of the current group we need to create a Timetable instance;
+     * For each Timetable we need a Subject instance;     *
+     */
+    private <T> List<T> findInTheFile(Workbook workbook, User user, String toFind, String relatedTo) {
+        List<StudyingGroup> lectureGroups = user.getLectureGroups();
         List<T> foundObjects = new ArrayList<>();
         String regex = "";
         switch (toFind) {
             case "group":
                 regex = "[А-Я]{2,3}-\\d{2,3}.*";
                 break;
-            case "subject":
+            case "timetable":
+                // If we're looking for a timetable for a certain group, we need to find this groups
+                regex = relatedTo;
                 break;
             default:
                 break;
@@ -121,13 +135,13 @@ public class UploadController {
             // Get all columns from the sheet
             ColumnCollection columns = sheet.getCells().getColumns();
             // Iterate over the columns
-            for (int j = 0; j < columns.getCount(); j++) {
+            for (int currentColumn = 0; currentColumn < columns.getCount(); currentColumn++) {
                 // Get all rows from the sheet
                 RowCollection rows = sheet.getCells().getRows();
                 // Iterate over the rows
-                for (int k = 0; k < rows.getCount(); k++) {
+                for (int currentRow = 0; currentRow < rows.getCount(); currentRow++) {
                     // Get the value of the row
-                    String cellValue = cells.get(k, j).getStringValue();
+                    String cellValue = cells.get(currentRow, currentColumn).getStringValue();
                     // Check if we took a group name
                     if (cellValue.matches(regex)) {
                         // If there are several group names in the cell, so it's a lecture class
@@ -140,14 +154,63 @@ public class UploadController {
                                 sg.setGroupName(cellValue);
                                 foundObjects.add((T) sg);
                             } else {
-                                // TODO: Do we need to assign a group without students to the user if it's present in the schedule
+                                // TODO: Do we need to assign a group without students to the user if it's present in the schedule?
                             }
+                        } else if (toFind.equals("timetable")) {
+                            // If we need to find a timetable, we need to initialize Subject and Timetable instances
+                            Subject subject = initSubject(user, cells, currentColumn, currentRow);
+                            Timetable timetable = initTimetable(cells, currentColumn, currentRow, sheet);
+                            timetable.setSubject(subject);
+                            foundObjects.add((T) timetable);
                         }
                     }
                 }
             }
         }
         return foundObjects;
+    }
+
+    private Subject initSubject(User user, Cells cells, int currentColumn, int currentRow) {
+        Subject subject = new Subject();
+        String subjectName = cells.get(currentRow - 2, currentColumn).getStringValue();
+        subject.setName(subjectName);
+        subject.setProf(user);
+        return subject;
+    }
+
+    /**
+     * Rules:
+     * 1. Subject's name is group name's position -2 rows;
+     * 2. Lesson type for Timetable is group name's position -1 row;
+     * 3. Date for timetable is sheet's name for month + pattern match [1-9]{1,2}$ for the current column;
+     * 4. Time for timetable is group name's position +1 row, substr before '-';
+     * 5. Classroom for timetable is group name's position +2 rows
+     */
+    private Timetable initTimetable(Cells cells, int currentColumn, int currentRow, Worksheet sheet) {
+        int bufRow = currentRow;
+        String lessonType = cells.get(bufRow - 1, currentColumn).getStringValue();
+        bufRow = currentRow;
+        String bufTime = cells.get(bufRow + 1, currentColumn).getStringValue();
+        int hour = Integer.parseInt(bufTime.substring(0, 2));
+        int minute = Integer.parseInt(bufTime.substring(3, 5));
+        LocalTime time = LocalTime.of(hour, minute);
+        int year = Year.now().getValue();
+        Month month = Month.valueOf(sheet.getName());
+        String day;
+        bufRow = currentRow;
+        do {
+            day = cells.get(bufRow--, currentColumn).getStringValue();
+        } while (!day.matches("[1-9]{1,2}$"));
+
+        LocalDate date = LocalDate.of(year, month, Integer.parseInt(day));
+        bufRow = currentRow;
+        String classRoom = cells.get(bufRow + 2, currentColumn).getStringValue();
+        Timetable timetable = new Timetable();
+        timetable.setLessonType(lessonType);
+        timetable.setTime(time);
+        timetable.setDate(date);
+        timetable.setClassroom(classRoom);
+        return timetable;
     }
 
     private boolean checkIfProfHasThisGroup(List<StudyingGroup> lectureGroups, String cellValue) {
@@ -168,7 +231,7 @@ public class UploadController {
     public String parseGroups(
             @RequestParam("file") MultipartFile reapExcelDataFile,
             @AuthenticationPrincipal User user) throws IOException {
-        List<Student> tempStudentList = new ArrayList<Student>();
+        List<Student> tempStudentList = new ArrayList<>();
 
         HSSFWorkbook workbook = new HSSFWorkbook(reapExcelDataFile.getInputStream());
 
