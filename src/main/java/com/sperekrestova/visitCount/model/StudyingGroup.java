@@ -40,7 +40,7 @@ public class StudyingGroup {
     @ManyToMany
     private List<User> profs;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Timetable> timetables;
 
     public StudyingGroup(String groupName) {

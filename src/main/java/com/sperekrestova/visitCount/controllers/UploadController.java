@@ -6,6 +6,7 @@ import com.aspose.cells.RowCollection;
 import com.aspose.cells.Workbook;
 import com.aspose.cells.Worksheet;
 import com.aspose.cells.WorksheetCollection;
+import com.sperekrestova.visitCount.model.Month;
 import com.sperekrestova.visitCount.model.Student;
 import com.sperekrestova.visitCount.model.StudyingGroup;
 import com.sperekrestova.visitCount.model.Subject;
@@ -28,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,9 +97,11 @@ public class UploadController {
                         findInTheFile(workbook, user, "timetable", group.getGroupName())
                 );
                 // Set list of found timetables to the user's group
-                group.setTimetables(timetables);
+                StudyingGroup byGroupName = groupRepository.findByGroupName(group.getGroupName());
+                byGroupName.setTimetables(timetables);
                 // Save to the db updated group
-                groupRepository.save(group);
+
+                groupRepository.save(byGroupName);
             }
         }
 
@@ -129,8 +131,6 @@ public class UploadController {
         WorksheetCollection sheets = workbook.getWorksheets();
         for (int i = 0; i < sheets.getCount(); i++) {
             Worksheet sheet = sheets.get(i);
-            sheet.getCells().deleteBlankRows();
-            sheet.getCells().deleteBlankColumns();
             Cells cells = sheet.getCells();
             // Get all columns from the sheet
             ColumnCollection columns = sheet.getCells().getColumns();
@@ -195,7 +195,7 @@ public class UploadController {
         int minute = Integer.parseInt(bufTime.substring(3, 5));
         LocalTime time = LocalTime.of(hour, minute);
         int year = Year.now().getValue();
-        Month month = Month.valueOf(sheet.getName());
+        int month = Month.valueOf(sheet.getName().toUpperCase()).getValue();
         String day;
         bufRow = currentRow;
         do {
