@@ -29,6 +29,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by Svetlana
@@ -61,7 +66,9 @@ public class UploadController {
             @RequestParam("file") MultipartFile reapExcelDataFile,
             @AuthenticationPrincipal User user) throws IOException {
 
-        //TODO: Подразумевается, что юзер уже загрузил группы. А что, если нет?
+        if (user.getLectureGroups().isEmpty()) {
+            return "redirect:/groups";
+        }
 
         List<StudyingGroup> lectureGroups = user.getLectureGroups();
         Workbook workbook = null;
@@ -72,7 +79,10 @@ public class UploadController {
         }
 
         List<StudyingGroup> sg = findInTheFile(workbook, lectureGroups, "group");
-        System.out.println(sg.toString());
+        List<String> groupsToFind = sg.stream()
+                .filter(distinctByKey(StudyingGroup::getGroupName))
+                .map(StudyingGroup::getGroupName)
+                .collect(Collectors.toList());
         
 
 
@@ -147,6 +157,11 @@ public class UploadController {
             }
         }
         return false;
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     @PostMapping("/groups")

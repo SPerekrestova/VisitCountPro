@@ -23,7 +23,12 @@ public class GroupController {
 
     @GetMapping()
     public String groups(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("lectureGroups", user.getLectureGroups());
+        if (user.getLectureGroups().isEmpty()) {
+            model.addAttribute("message", "Вы не загрузили ни одной группы!");
+        } else {
+            model.addAttribute("message", "Список загруженных групп:");
+            model.addAttribute("lectureGroups", user.getLectureGroups());
+        }
         return "groups/groups";
     }
 

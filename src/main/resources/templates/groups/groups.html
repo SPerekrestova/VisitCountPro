@@ -9,6 +9,8 @@
     <header th:insert="blocks/header.html :: header"></header>
     <h1>Группы</h1>
 
+    <h2 th:text="${message}"></h2>
+
     <div class="my-2">
         <div th:each="group : ${lectureGroups}" class="my-3">
             <a th:href="@{/groups/{id}(id=${group.getId()})}" role="button" class="btn btn-lg btn-primary">
