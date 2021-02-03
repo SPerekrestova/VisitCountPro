@@ -13,6 +13,8 @@ import com.sperekrestova.visitCount.model.Subject;
 import com.sperekrestova.visitCount.model.Timetable;
 import com.sperekrestova.visitCount.model.User;
 import com.sperekrestova.visitCount.repository.GroupRepository;
+import com.sperekrestova.visitCount.repository.SubjectRepository;
+import com.sperekrestova.visitCount.repository.TimetableRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -49,6 +51,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/upload")
 public class UploadController {
     private final GroupRepository groupRepository;
+    private final TimetableRepository timetableRepository;
+    private final SubjectRepository subjectRepository;
 
     @GetMapping("/timetable")
     public String timetable() {
@@ -98,9 +102,10 @@ public class UploadController {
                 );
                 // Set list of found timetables to the user's group
                 StudyingGroup byGroupName = groupRepository.findByGroupName(group.getGroupName());
+                byGroupName.getTimetables().clear();
                 byGroupName.setTimetables(timetables);
                 // Save to the db updated group
-
+                //TODO: Another exception..
                 groupRepository.save(byGroupName);
             }
         }
@@ -159,8 +164,11 @@ public class UploadController {
                         } else if (toFind.equals("timetable")) {
                             // If we need to find a timetable, we need to initialize Subject and Timetable instances
                             Subject subject = initSubject(user, cells, currentColumn, currentRow);
+                            //create a timetable instance
                             Timetable timetable = initTimetable(cells, currentColumn, currentRow, sheet);
+                            //assign a subject to it
                             timetable.setSubject(subject);
+                            timetable.setSubjectTableId(subject.getId());
                             foundObjects.add((T) timetable);
                         }
                     }
@@ -171,11 +179,15 @@ public class UploadController {
     }
 
     private Subject initSubject(User user, Cells cells, int currentColumn, int currentRow) {
-        Subject subject = new Subject();
         String subjectName = cells.get(currentRow - 2, currentColumn).getStringValue();
+        if (subjectRepository.findByName(subjectName) != null) {
+            return subjectRepository.findByName(subjectName);
+        }
+        Subject subject = new Subject();
         subject.setName(subjectName);
         subject.setProf(user);
-        return subject;
+        //save the subject to db and return
+        return subjectRepository.save(subject);
     }
 
     /**
